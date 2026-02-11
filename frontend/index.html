@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsFlow - Breaking News & Global Updates</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0066FF 0%, #FF3333 100%);
+            min-height: 100vh;
+            padding: 20px;
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #0066FF 0%, #FF3333 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M0,50 Q300,0 600,50 T1200,50 L1200,120 L0,120 Z" fill="rgba(255,255,255,0.1)"></path></svg>');
+            background-size: cover;
+            opacity: 0.3;
+        }
+
+        header > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            opacity: 0.95;
+            font-size: 1.2em;
+            letter-spacing: 0.5px;
+        }
+
+        .controls {
+            padding: 25px 30px;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button {
+            background: linear-gradient(135deg, #0066FF 0%, #FF3333 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.2);
+            transition: left 0.3s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #FF3333 0%, #0066FF 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 102, 255, 0.4);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 25px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .news-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .news-section h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 2em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .news-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .news-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 15px;
+        }
+
+        .news-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+            border-color: #0066FF;
+        }
+
+        .news-image {
+            width: 180px;
+            height: 140px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+        }
+
+        .news-content-wrapper {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card h3 {
+            color: #0066FF;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .news-meta {
+            color: #999;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .news-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .news-text {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            flex: 1;
+        }
+
+        .news-link {
+            color: #0066FF;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .news-link:hover {
+            color: #FF3333;
+            gap: 8px;
+        }
+
+        .chat-section {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #0066FF 0%, #FF3333 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .message {
+            margin-bottom: 8px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 90%;
+            word-wrap: break-word;
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #0066FF 0%, #FF3333 100%);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+            box-shadow: 0 2px 8px rgba(0, 102, 255, 0.2);
+        }
+
+        .message.bot {
+            background: white;
+            border: 1px solid #e9ecef;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            background: white;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .chat-input input:focus {
+            outline: none;
+            border-color: #0066FF;
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 40px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0066FF;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            padding: 14px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #f5130d;
+        }
+
+        .success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            padding: 14px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        @media (max-width: 968px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-section {
+                height: 400px;
+            }
+
+            .news-card {
+                flex-direction: column;
+            }
+
+            .news-image {
+                width: 100%;
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .controls {
+                gap: 8px;
+            }
+
+            button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-newspaper"></i> NewsFlow</h1>
+            <p>⚡ Breaking News • Global Updates • Real-Time Intelligence ⚡</p>
+        </header>
+
+        <div class="controls">
+            <button onclick="scrapeNews('technology')">
+                <i class="fas fa-microchip"></i> Tech News
+            </button>
+            <button onclick="scrapeNews('business')">
+                <i class="fas fa-briefcase"></i> Business News
+            </button>
+            <button onclick="scrapeNews('science')">
+                <i class="fas fa-flask"></i> Science News
+            </button>
+            <button onclick="loadNews()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+
+        <div class="content">
+            <div class="news-section">
+                <h2><i class="fas fa-rss-square"></i> Latest News</h2>
+                <div id="newsContainer" class="news-grid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading news articles...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-section">
+                <div class="chat-header">
+                    <i class="fas fa-robot"></i> AI Assistant
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        👋 Hello! I'm your AI news assistant. Ask me anything about the latest news!
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input 
+                        type="text" 
+                        id="chatInput" 
+                        placeholder="Ask about news..."
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button onclick="sendMessage()" style="width: auto;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        const categoryEmojis = {
+            'technology': '💻',
+            'business': '💼',
+            'science': '🔬',
+            'health': '🏥',
+            'sports': '⚽',
+            'entertainment': '🎬',
+            'general': '📌'
+        };
+
+        window.onload = function() {
+            loadNews();
+        };
+
+        async function loadNews() {
+            const container = document.getElementById('newsContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading news...</p></div>';
+
+            try {
+                const response = await fetch(`${API_URL}/news`);
+                const articles = await response.json();
+
+                if (articles.length === 0) {
+                    container.innerHTML = '<div class="loading"><p>📭 No news articles yet. Click a button to fetch articles!</p></div>';
+                    return;
+                }
+
+                container.innerHTML = articles.map((article, index) => {
+                    const category = article.category || 'general';
+                    const emoji = categoryEmojis[category.toLowerCase()] || '📰';
+                    
+                    return `
+                        <div class="news-card" style="animation-delay: ${index * 0.05}s;">
+                            <div class="news-image">${emoji}</div>
+                            <div class="news-content-wrapper">
+                                <h3>${article.title}</h3>
+                                <div class="news-meta">
+                                    <span><i class="fas fa-building"></i> ${article.source || 'Unknown'}</span>
+                                    <span><i class="fas fa-tag"></i> ${category}</span>
+                                </div>
+                                <p class="news-text">${article.content || 'No description available'}</p>
+                                ${article.url ? `<a href="${article.url}" target="_blank" class="news-link"><i class="fas fa-external-link-alt"></i> Read full article</a>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                container.innerHTML = `<div class="error"><i class="fas fa-exclamation-circle"></i> Error loading news: ${error.message}</div>`;
+            }
+        }
+
+        async function scrapeNews(category) {
+            const button = event.target.closest('button');
+            const originalHTML = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scraping...';
+
+            try {
+                const response = await fetch(`${API_URL}/scrape`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        source: 'all',
+                        category: category
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showNotification(`✅ ${result.message}`, 'success');
+                    loadNews();
+                } else {
+                    showNotification(`❌ ${result.message}`, 'error');
+                }
+
+            } catch (error) {
+                showNotification(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalHTML;
+            }
+        }
+
+        function showNotification(message, type) {
+            const container = document.getElementById('newsContainer');
+            const div = document.createElement('div');
+            div.className = type === 'success' ? 'success' : 'error';
+            div.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            container.insertBefore(div, container.firstChild);
+            setTimeout(() => div.remove(), 4000);
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            addMessage(message, 'user');
+            input.value = '';
+
+            const chatMessages = document.getElementById('chatMessages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message bot';
+            loadingDiv.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; margin: 0;"></div>';
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_message: message
+                    })
+                });
+
+                const result = await response.json();
+                chatMessages.removeChild(loadingDiv);
+                addMessage(result.bot_message, 'bot');
+
+            } catch (error) {
+                chatMessages.removeChild(loadingDiv);
+                addMessage(`Sorry, I encountered an error: ${error.message}`, 'bot');
+            }
+        }
+
+        function addMessage(text, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
+python3 main.py
